@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EEE 312 CBT Portal</title>
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;margin:0;background:#f0f2f5;color:#333;}
+.container{max-width:900px;margin:20px auto;padding:0 15px;}
+h1,h2,h3{margin:0 0 10px 0;}
+.card{background:white;padding:20px;border-radius:12px;margin-top:20px;box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+#news{background:#ff4d4f;color:white;padding:10px;overflow:hidden;white-space:nowrap;border-radius:8px;}
+#news span{display:inline-block;padding-left:100%;animation:move 12s linear infinite;font-weight:bold;}
+@keyframes move{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+h1{text-align:center;color:#1890ff;margin-bottom:15px;}
+button{padding:12px;margin:5px 0;width:100%;border:none;border-radius:8px;background:#1890ff;color:white;font-size:16px;transition:0.3s;}
+button:hover{background:#096dd9;cursor:pointer;}
+#register{background:#52c41a;text-align:center;display:block;text-decoration:none;padding:12px;color:white;border-radius:8px;margin-top:10px;transition:0.3s;}
+#register:hover{background:#389e0d;}
+input[type=text], textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px;box-sizing:border-box;font-size:16px;}
+.star{font-size:28px;color:#ccc;cursor:pointer;transition:0.3s;}
+.star.active{color:gold;}
+.progress-container{background:#e0e0e0;border-radius:10px;margin:10px 0;height:22px;overflow:hidden;}
+#progressBar{width:0%;height:22px;background:#1890ff;text-align:center;color:white;line-height:22px;font-weight:bold;border-radius:10px;transition:width 0.3s;}
+input[type=radio]{margin-right:8px;}
+#leaderboard p, #comments p{margin:5px 0;padding:6px 10px;background:#f5f5f5;border-radius:8px;}
+#comments{max-height:200px;overflow-y:auto;}
+@media(max-width:600px){.container{padding:10px;} button{font-size:14px;}}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div id="news"><span>EEE 312 ANALOGUE ELECTRONIC CIRCUIT CBT EXAMS HAS BEEN POSTPONED</span></div>
+
+<h1>EEE 312 CBT Portal</h1>
+<a id="register" href="https://share.google/b3eHSCaSD0R2LRqdT" target="_blank">Register for CBT Exam</a>
+
+<div class="card" id="nameCard">
+<h2>Welcome</h2>
+<p>Please enter your name to start the exam:</p>
+<input type="text" id="studentNameInput" placeholder="Enter your name">
+<button onclick="startExam()">Start Exam</button>
+</div>
+
+<div class="card" id="greetingCard" style="display:none;">
+<h2 id="greeting"></h2>
+</div>
+
+<div class="card" id="quizCard" style="display:none;">
+<h3 id="timer" style="text-align:center;color:#1890ff;">Time Left: 30:00</h3>
+<div class="progress-container"><div id="progressBar">0%</div></div>
+<div id="quiz"></div>
+<button onclick="prev()">⬅️ Previous</button>
+<button onclick="next()">Next ➡️</button>
+<button onclick="submitQuiz()">Submit</button>
+<div id="result"></div>
+<div id="answers"></div>
+</div>
+
+<div class="card">
+<h3>Rate this CBT</h3>
+<div id="stars">
+<span class="star" onclick="rate(1)">★</span>
+<span class="star" onclick="rate(2)">★</span>
+<span class="star" onclick="rate(3)">★</span>
+<span class="star" onclick="rate(4)">★</span>
+<span class="star" onclick="rate(5)">★</span>
+</div>
+</div>
+
+<div class="card">
+<h3>Comments</h3>
+<textarea id="commentBox" placeholder="Share your thoughts..."></textarea>
+<button onclick="addComment()">Post</button>
+<div id="comments"></div>
+</div>
+
+<div class="card">
+<h3>🏆 Leaderboard</h3>
+<div id="leaderboard"></div>
+</div>
+
+</div>
+
+<script>
+// ===== NAME =====
+let studentName="";
+function startExam(){
+    const input=document.getElementById("studentNameInput").value.trim();
+    if(!input){alert("Please enter your name!");return;}
+    studentName=input;
+    document.getElementById("nameCard").style.display="none";
+    document.getElementById("greeting").innerText=`Hi, ${studentName}! Good luck.`;
+    document.getElementById("greetingCard").style.display="block";
+    document.getElementById("quizCard").style.display="block";
+    load(); startTimer(); displayLeaderboard();
+}
+
+// ===== QUESTIONS (All 70) =====
+const questions=[
+{q:"What is a PN-junction diode made of?",o:["Two N-type materials","A P-type and an N-type material","Two P-type materials","A metal and an insulator"],a:1},
+{q:"How many operating conditions are there for a PN-junction diode?",o:["One","Two","Three","Four"],a:2},
+{q:"The term 'bias' in electronics refers to:",o:["The internal resistance","The application of external voltage","The temperature of the device","The doping concentration"],a:1},
+{q:"Which of these is a popular semiconductor material?",o:["Copper","Silicon","Gold","Iron"],a:1},
+{q:"In a P-type semiconductor, the majority carriers are:",o:["Electrons","Protons","Holes","Neutrons"],a:2},
+{q:"To create an N-type semiconductor, which element is added to intrinsic Silicon?",o:["Trivalent","Pentavalent","Tetravalent","Noble gas"],a:1},
+{q:"Minority charge carriers in both N-type and P-type materials depend on:",o:["External voltage","Doping level","Temperature","Surface area"],a:2},
+{q:"Which of the following is a trivalent impurity?",o:["Arsenic","Boron","Phosphorus","Antimony"],a:1},
+{q:"Diffusion current is caused by:",o:["External electric field","Concentration gradient","Magnetic fields","Gravity"],a:1},
+{q:"The region with no mobile charge carriers near the junction is called the:",o:["Conductive region","Active region","Depletion region","Saturation region"],a:2},
+{q:"Immobile negative ions in P-type material are called:",o:["Donor ions","Acceptor ions","Cations","Free electrons"],a:1},
+{q:"The movement of majority carriers across the junction results in:",o:["Drift current","Diffusion current","Leakage current","Eddy current"],a:1},
+{q:"What is the direction of the electric field in the depletion region?",o:["From P to N","From N to P","Circular","Upwards"],a:1},
+{q:"Which process causes immobile ions to 'surface out' or become uncovered?",o:["Ionization","Recombination","Oxidation","Evaporation"],a:1},
+{q:"The barrier potential for Silicon (Si) is typically:",o:["0.3 V","0.7 V","1.1 V","5.0 V"],a:1},
+{q:"Drift current is caused by the movement of:",o:["Majority carriers","Minority carriers","Immobile ions","Neutrons"],a:1},
+{q:"Under steady-state conditions in an open-circuited diode, the net current is:",o:["Infinite","Equal to diffusion current","Zero","Equal to drift current"],a:2},
+{q:"The formula V_T = KT/e represents:",o:["Barrier potential","Thermal voltage","Breakdown voltage","Supply voltage"],a:1},
+{q:"Thermal voltage (V_T) at room temperature is approximately:",o:["26 mV","700 mV","1 V","0.3 V"],a:0},
+{q:"The width of the depletion region (W_d) depends on:",o:["Only N_A","Only N_D","Both N_A, N_D, and V_b","Only the battery size"],a:2},
+{q:"Who invented the BJT in 1946?",o:["Newton, Einstein, Bohr","Bardeen, Brattain, Shockley","Tesla and Edison","Kilby and Noyce"],a:1},
+{q:"The BJT replaced the use of:",o:["Microchips","Bulky vacuum tubes","Copper wires","Resistors"],a:1},
+{q:"How many terminals does a BJT have?",o:["Two","Three","Four","Five"],a:1},
+{q:"The three terminals of a BJT are:",o:["Anode, Cathode, Gate","Emitter, Base, Collector","Source, Drain, Gate","Positive, Negative, Ground"],a:1},
+{q:"The two types of BJTs are:",o:["PNP and NPN","P-channel and N-channel","Active and Passive","Silicon and Germanium"],a:0},
+{q:"In terms of physical size, which region of the BJT is the largest?",o:["Emitter","Base","Collector","They are all equal"],a:2},
+{q:"Why is the collector region made larger?",o:["To look better","For better heat dissipation","To hold more electrons","To increase resistance"],a:1},
+{q:"Which region of the BJT is the most heavily doped?",o:["Collector","Base","Emitter","Junction"],a:2},
+{q:"Which region of the BJT is the thinnest and least doped?",o:["Emitter","Base","Collector","Depletion"],a:1},
+{q:"How many junctions does a BJT have?",o:["One","Two","Three","None"],a:1},
+{q:"The J_1 junction in a BJT is the:",o:["Collector-Base junction","Emitter-Base junction","Emitter-Collector junction","Gate-Source junction"],a:1},
+{q:"A BJT is equivalent to two diodes connected:",o:["In series","In parallel","Back to back","End to end"],a:2},
+{q:"Why is the NPN transistor more popular than the PNP?",o:["It is cheaper","Mobility of electrons is higher than holes","It uses less power","It is smaller"],a:1},
+{q:"In the name 'Bipolar Junction Transistor,' 'Bipolar' refers to:",o:["Having two poles (+ and -)","Two types of charge carriers (holes and electrons)","Operating in two directions","Having two junctions"],a:1},
+{q:"The doping concentration order in a BJT is:",o:["C > E > B","E > C > B","B > E > C","E > B > C"],a:1},
+{q:"The width order of BJT regions is:",o:["C > E > B","B > E > C","E > C > B","C > B > E"],a:0},
+{q:"What is the primary function of a BJT?",o:["To store energy","To rectify AC to DC","To amplify weak signals and switching","To measure voltage"],a:2},
+{q:"In an NPN transistor, the arrow on the symbol points:",o:["Inward towards the base","Outward from the emitter","Upward towards the collector","Nowhere"],a:1},
+{q:"In a PNP transistor, the arrow on the symbol points:",o:["Inward towards the base","Outward from the emitter","Downward","Left"],a:0},
+{q:"The J_2 junction in a BJT is the:",o:["Emitter-Base junction","Collector-Base junction","Emitter-Collector junction","Base-Gate junction"],a:1},
+{q:"What is the value of Boltzmann's constant (K)?",o:["1.6 ×10^-19 J/K","1.38 ×10^-23 J/K","8.85 ×10^-12 J/K","6.62 ×10^-34 J/K"],a:1},
+{q:"Absolute temperature (T) is measured in:",o:["Celsius","Fahrenheit","Kelvin","Rankine"],a:2},
+{q:"To convert Celsius to Kelvin, you add:",o:["100","273","32","460"],a:1},
+{q:"What happens to covalent bonds when temperature increases?",o:["They get stronger","They break and release electrons","They turn into ionic bonds","Nothing"],a:1},
+{q:"Which of the following is NOT a trivalent impurity?",o:["Boron","Aluminum","Phosphorus","Indium"],a:2},
+{q:"Germanium (Ge) has a barrier potential of approximately:",o:["0.7 V","0.3 V","1.5 V","0.1 V"],a:1},
+{q:"The process of adding impurities to a semiconductor is called:",o:["Diffusion","Doping","Recombination","Drift"],a:1},
+{q:"Electrical neutrality in a P-type material is maintained by:",o:["Holes only","Majority carriers and immobile ions","Electrons only","Battery voltage"],a:1},
+{q:"The depletion region is also known as the:",o:["Active layer","Space charge region","Neutral zone","Resistance band"],a:1},
+{q:"Diffusion current moves from:",o:["Low to high concentration","High to low concentration","Negative to positive terminal","Ground to VCC"],a:1},
+{q:"The charge of an electron (e) is:",o:["1.6 ×10^-19 C","1.38 ×10^-23 C","9.1 ×10^-31 C","1.0 C"],a:0},
+{q:"Electrical permittivity (ε) is the product of:",o:["ε_r and ε_0","V and I","N_A and N_D","K and T"],a:0},
+{q:"Intrinsic carrier density is represented by:",o:["N_A","N_D","n_i","V_b"],a:2},
+{q:"The formula for V_b involves the natural log (ln) of:",o:["(N_A N_D/n_i^2)","(N_A + N_D)","(V_T/e)","(T/273)"],a:0},
+{q:"Silicon has a dielectric constant (ε) of approximately:",o:["1.1244 ×10^-12 F/cm","1.04 ×10^-12 F/cm","8.85 ×10^-14 F/cm","1.6 ×10^-19 F/cm"],a:1},
+{q:"In the equation for W_d, what does 'q' represent?",o:["Quality factor","Electron charge","Heat","Quenching"],a:1},
+{q:"If N_A = 10^16 and N_D = 10^17 for Si at room temp, V_b is roughly:",o:["0.501 V","0.757 V","0.329 V","1.2 V"],a:1},
+{q:"The width of the depletion region is measured in:",o:["Volts","Amperes","Centimeters or Micrometers","Ohms"],a:2},
+{q:"Which impurity is pentavalent?",o:["Boron","Gallium","Antimony","Aluminum"],a:2},
+{q:"Drift current direction is:",o:["Same as diffusion","Opposite to diffusion","Perpendicular to diffusion","Random"],a:1},
+{q:"A diode acts as a one-way valve for:",o:["Voltage","Current","Temperature","Pressure"],a:1},
+{q:"Which scientist was NOT part of the BJT invention team?",o:["Walter Brattain","William Shockley","John Bardeen","Albert Einstein"],a:3},
+{q:"The Base-Emitter junction must be ____ biased for the BJT to conduct.",o:["Reverse","Forward","Not","Indirectly"],a:1},
+{q:"The 'Barrier Potential' prevents:",o:["Only holes from moving","Only electrons from moving","Majority carriers from crossing","The battery from draining"],a:2},
+{q:"Intrinsic semiconductors are:",o:["Highly conductive","Pure semiconductors","Heavily doped","Insulators"],a:1},
+{q:"What is the symbol for Germanium?",o:["Gm","Ge","Gr","Gi"],a:1},
+{q:"The V_T value of 26mV is valid at:",o:["0 Kelvin","Room temperature (approx 27°C or 300K)","100°C","Boiling point"],a:1},
+{q:"In P-type material, immobile ions have what charge?",o:["Positive","Negative","Neutral","Variable"],a:1},
+{q:"A BJT can be used as a:",o:["Switch","Capacitor","Inductor","Transformer"],a:0},
+{q:"The formation of the depletion region creates a:",o:["Magnetic field","Electric field","Gravitational field","Vacuum"],a:1}
+];
+
+// ===== ENGINE =====
+let current=0,answers=new Array(questions.length).fill(null);
+function load(){
+    let q=questions[current];
+    let html=`<h3>Q ${current+1}/${questions.length}</h3><p>${q.q}</p>`;
+    q.o.forEach((opt,i)=>html+=`<input type="radio" name="ans" value="${i}" ${answers[current]==i?"checked":""}> ${opt}<br>`);
+    document.getElementById("quiz").innerHTML=html;
+    updateProgress();
+}
+function save(){let s=document.querySelector('input[name="ans"]:checked');if(s)answers[current]=+s.value;}
+function next(){save();if(current<questions.length-1){current++;load();}}
+function prev(){save();if(current>0){current--;load();}}
+
+// ===== PROGRESS =====
+function updateProgress(){
+    let percent=Math.floor(((current+1)/questions.length)*100);
+    let
